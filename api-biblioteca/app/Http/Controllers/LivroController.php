@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Autor;
+use App\Models\Genero;
 use App\Models\Livro;
+use App\Models\Editora;
 use App\Http\Requests\LivroRequest;
 use App\Traits\ApiResponser;
 
@@ -16,7 +19,23 @@ class LivroController extends Controller
      */
     public function index()
     {
-        $dados=Livro::all();
+        $dados = array();
+        foreach (Livro::all() as $livros) {
+            $perso = array();
+
+            $editora = Editora::where('id', $livros->id_editora)->first();
+            $genero = Genero::where('id', $livros->id_genero)->first();
+            $autor = Autor::where('id', $livros->id_autor)->first();
+
+            $perso['id'] = $livros->id;
+            $perso['titulo'] = $livros->titulo;
+            $perso['ano'] = $livros->ano;
+            $perso['editora'] = $editora->nome_editora;
+            $perso['autor'] = $autor->nome;
+            $perso['genero'] = $genero->descricao;
+
+            $dados[] = $perso;
+        }
         return json_encode($dados);
     }
 
